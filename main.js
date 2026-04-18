@@ -96,22 +96,36 @@ function generateBirthdate(minAge, maxAge) {
 export function main(dtoIn) {
   const result = [];
 
+  // Set to store already used birthdates (to ensure uniqueness)
+  const usedBirthdates = new Set();
+
   // loop to generate required number of employees
   for (let i = 0; i < dtoIn.count; i++) {
 
     // randomly assign gender
     const gender = Math.random() < 0.5 ? "male" : "female";
 
-    // select name and surname based on gender
+    // select name based on gender
     const name =
       gender === "male"
         ? getRandom(maleFirstnames)
         : getRandom(femaleFirstnames);
 
+    // select surname based on gender
     const surname =
       gender === "male"
         ? getRandom(maleSurnames)
         : getRandom(femaleSurnames);
+
+    // generate unique birthdate
+    // keep generating until we find a birthdate that hasn't been used yet
+    let birthdate;
+    do {
+      birthdate = generateBirthdate(dtoIn.age.min, dtoIn.age.max);
+    } while (usedBirthdates.has(birthdate));
+
+    // store the unique birthdate
+    usedBirthdates.add(birthdate);
 
     // create employee object
     result.push({
@@ -119,7 +133,7 @@ export function main(dtoIn) {
       name,
       surname,
       workload: getRandom(workload),
-      birthdate: generateBirthdate(dtoIn.age.min, dtoIn.age.max),
+      birthdate,
     });
   }
 
